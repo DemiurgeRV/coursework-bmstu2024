@@ -1,0 +1,129 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Канальный уровень",
+    "description": "Спецификация канального уровня курсовой работы по дисциплине Сетевые технологии в АСОИУ",
+    "contact": {
+      "name": "Владислав Рыбин",
+      "url": "https://github.com/DemiurgeRV",
+      "email": "rybinvladislav@mail.ru"
+    },
+    "version": "1.0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api/v1",
+      "description": "Dev server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Message",
+      "description": "Работа с сегментами сообщений"
+    }
+  ],
+  "paths": {
+    "/segment_processing": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "summary": "Метод получения, обработки и передачи сегмента от Транспортного уровня",
+        "description": "Принимает json сегмент от транспортного уровня длинной 100 байт, кодирует его [7, 4]-кодом Хемминга, вносит ошибку с вероятностью 10% и теряет сообщение с вероятностью 2%. После этого сообщение декодируется. При декодировании либо пакет с ошибкой теряется, либо передается обратно на транспортный после исправления.",
+        "operationId": "getSegment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Segment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Segment"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка на стороне сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Success": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "ОК"
+          }
+        }
+      },
+      "InternalServerError": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Ошибка на стороне сервера"
+          }
+        }
+      },
+      "Segment": {
+        "type": "object",
+        "required": [
+          "id",
+          "seq_id",
+          "data",
+          "msg_len"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-03-29T16:20:00+03:00"
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 5
+          },
+          "seq_id": {
+            "type": "integer",
+            "example": 4
+          },
+          "data": {
+            "type": "string",
+            "example": "dncbdkbcDkKDJSJJSdjkn2131hbhb"
+          },
+          "msg_len": {
+            "type": "integer",
+            "example": 12
+          }
+        }
+      }
+    }
+  }
+}
